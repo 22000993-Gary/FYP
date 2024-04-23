@@ -6,18 +6,18 @@ contract CrowdFunding {
         address owner;
         string title;
         string description;
-        uint256 target;
+        uint256 goalAmt;
         uint256 deadline;
         uint256 amountCollected;
         string image;
         address[] donators;
-        uint256[] donations;
+        uint256[] donationsCollected;
     }
      mapping(uint256 => Campaign) public campaigns;
 
     uint256 public numberOfCampaigns = 0;
 
-    function createCampaign(address _owner, string memory _title, string memory _description, uint256 _target, uint256 _deadline, string memory _image) public returns (uint256) {
+    function createCampaign(address _owner, string memory _title, string memory _description, uint256 _goalAmt, uint256 _deadline, string memory _image) public returns (uint256) {
         Campaign storage campaign = campaigns[numberOfCampaigns];
 
         require(campaign.deadline < block.timestamp, "The deadline should be a date in the future.");
@@ -25,7 +25,7 @@ contract CrowdFunding {
         campaign.owner = _owner;
         campaign.title = _title;
         campaign.description = _description;
-        campaign.target = _target;
+        campaign.goalAmt = _goalAmt;
         campaign.deadline = _deadline;
         campaign.amountCollected = 0;
         campaign.image = _image;
@@ -41,7 +41,7 @@ contract CrowdFunding {
         Campaign storage campaign = campaigns[_id];
 
         campaign.donators.push(msg.sender);
-        campaign.donations.push(amount);
+        campaign.donationsCollected.push(amount);
 
         (bool sent,) = payable(campaign.owner).call{value: amount}("");
 
@@ -51,7 +51,7 @@ contract CrowdFunding {
     }
 
     function getDonators(uint256 _id) view public returns (address[] memory, uint256[] memory) {
-        return (campaigns[_id].donators, campaigns[_id].donations);
+        return (campaigns[_id].donators, campaigns[_id].donationsCollected);
     }
 
     function getCampaigns() public view returns (Campaign[] memory) {
